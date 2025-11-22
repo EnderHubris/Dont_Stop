@@ -5,11 +5,11 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider2D))]
 public class Chunk : MonoBehaviour
 {
-    /// <summary>
-    /// List of all possible chunks that can be spawned in at a given side
-    /// </summary>
     [Header("Available Chunk List")]
-    [SerializeField] List<GameObject> LeftChunks, RightChunks, TopChunks, BottomChunks;
+    [SerializeField] List<GameObject> LeftChunks;
+    [SerializeField] List<GameObject> RightChunks;
+    [SerializeField] List<GameObject> TopChunks;
+    [SerializeField] List<GameObject> BottomChunks;
 
     [Header("Position References to Spawn Chunks at")]
     [SerializeField] Transform leftPoint;
@@ -23,14 +23,35 @@ public class Chunk : MonoBehaviour
     [SerializeField] bool spawnTop = false;
     [SerializeField] bool spawnBottom = false;
 
+    [Header("Metadata")]
+    public bool isOrigin = false;
+
+    [HideInInspector] public Chunk child = null;
+    [HideInInspector] public Chunk parent = null;
+    List<GameObject> childSourceList;
+
     // code that prevents backtracking in recursion chain
     int ignoreCode = -1;
 
     // recursively run down the neighbor chain
     Chunk leftNeighbor, rightNeighbor, topNeighbor, bottomNeighbor;
 
+    public Vector3 position
+    {
+        get
+        {
+            return transform.position;
+        }
+        set
+        {
+            transform.position = value;
+        }
+    }
+
     void Start()
     {
+        ChunkManager.Instance.AddChunk(this);
+
         if (spawnLeft && leftPoint != null)
         {
             leftNeighbor = SpawnNeighborChunk(ref LeftChunks, leftPoint.position);
@@ -71,6 +92,9 @@ public class Chunk : MonoBehaviour
         GameObject newChunk = Instantiate(chunks[rIndex], spawnPosition, Quaternion.identity);
         if (distFromPlayer >= ChunkManager.Instance.GetMaxRenderDistance())
             newChunk.gameObject.SetActive(false);
+
+        child = newChunk.GetComponent<Chunk>();
+        if (child != null) child.parent = this;
 
         return newChunk.GetComponent<Chunk>();
     }
@@ -122,4 +146,9 @@ public class Chunk : MonoBehaviour
     public Chunk GetRightNeighbor() => rightNeighbor;
     public Chunk GetTopNeighbor() => topNeighbor;
     public Chunk GetBottomNeighbor() => bottomNeighbor;
+
+    public void Delete()
+    {
+        Destroy(gameObject, 0.15f); // give time-slice to return data
+    }
 }//EndScript

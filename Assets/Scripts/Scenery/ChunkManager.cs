@@ -10,6 +10,7 @@ using UnityEditor;
 public class ChunkManager : Singleton<ChunkManager>
 {
     [SerializeField] int MaxRenderDistance = 35, recursiveMax = 100;
+    Dictionary<Vector3,Chunk> chunks = new Dictionary<Vector3, Chunk>();
     Chunk chunkWithPlayer = null;
     int chunksVisited = 0;
 
@@ -19,6 +20,45 @@ public class ChunkManager : Singleton<ChunkManager>
         if (chunkWithPlayer != null)
         {
             chunkWithPlayer.TestChunk(-1);
+        }
+    }
+
+    public void AddChunk(Chunk chunk)
+    {
+        // check if a chunk being added is conflicting with another chunk
+        bool confliction = !(chunks.TryAdd(chunk.position, chunk));
+        if (confliction)
+        {
+            // if there is a confliction we need to swap the chunk at
+            // a given position for a chunk that its neighbors are compatable with
+            Chunk conflictingChunk = chunks[chunk.position];
+
+            if (conflictingChunk.isOrigin)
+            {
+                Debug.Log("+++ Confliction with Origin Chunk! +++");
+                chunk.Delete();
+                return;
+            }
+
+            // grab reference to both chunks we need to connect
+            Chunk chunkA = chunk.parent; // parent of newly spawned chunk
+            Chunk chunkB = conflictingChunk.parent; // parent of chunk being conflicted by new chunk
+
+            // check if conflicting chunk has a child and track a refernce to it
+            Chunk childPresent = conflictingChunk.child;
+
+            // remove both child chunks
+            chunk.Delete();
+            conflictingChunk.Delete();
+
+            if (childPresent == null)
+            {
+                // find a chunk that is compatable with chunks A and B
+            } else
+                {        
+                    // if child is present they need to be considered when
+                    // finding a compatable chunk between chunks A and B
+                }
         }
     }
 
