@@ -6,8 +6,8 @@ public static class PlayerInput // support keyboard and controller
 {
     public static bool PressedJump() => Input.GetKeyDown(KeyCode. Space) || Input.GetButtonDown("Jump");
     public static bool HoldingJump() => Input.GetKey(KeyCode. Space) || Input.GetButton("Jump");
-    public static bool MovingLeft() => Input.GetKey(KeyCode. A) || Input.GetAxis("Horizontal") < -0.15f;
-    public static bool MovingRight() => Input.GetKey(KeyCode. D) || Input.GetAxis("Horizontal") > 0.15f;
+    public static bool MovingLeft() => Input.GetKey(KeyCode. A) || Input.GetAxis("Left_Stick_Horizontal") < -0.15f;
+    public static bool MovingRight() => Input.GetKey(KeyCode. D) || Input.GetAxis("Left_Stick_Horizontal") > 0.15f;
     public static bool PressedAttack() => Input.GetMouseButtonDown(1) || Input.GetButtonDown("Attack");
 }
 
