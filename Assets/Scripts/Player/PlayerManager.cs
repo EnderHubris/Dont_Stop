@@ -1,3 +1,5 @@
+using Utilities;
+
 using UnityEngine;
 using System.Threading.Tasks;
 
@@ -57,8 +59,21 @@ public class PlayerManager : Singleton<PlayerManager>
     public int attackDamage = 10;
     [SerializeField] int health = 100;
 
+    RunAfter evt;
+    public void ToggleIFrame()
+    {
+        iframeActive = true;
+        evt = new RunAfter(1f, DisableIFrame);
+    }
+    void DisableIFrame()
+    {
+        iframeActive = false;
+    }
+
     public void TakeDamage(int amount)
     {
+        if (iframeActive) return;
+        
         health -= amount;
         if (health <= 0)
         {
@@ -79,6 +94,7 @@ public class PlayerManager : Singleton<PlayerManager>
     public bool attacking = false;
     public bool falling = false;
     bool isDead = false;
+    [SerializeField] bool iframeActive = false;
 
     public bool IsDead() => isDead;
 
