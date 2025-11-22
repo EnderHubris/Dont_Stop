@@ -103,7 +103,8 @@ public class PlayerMovement : MonoBehaviour
                 } else
                     {
                         // falling
-                        rb2d.linearVelocityY += -10 * PlayerManager.Instance.gravityMultiplier * Time.deltaTime;
+                        if (rb2d.linearVelocityY < -24) rb2d.linearVelocityY = -20; // cap player falling velocity
+                        else rb2d.linearVelocityY += -10 * PlayerManager.Instance.gravityMultiplier * Time.deltaTime;
                     }
             }
     }
