@@ -1,23 +1,28 @@
+using Utilities;
+
 using UnityEngine;
 
-public static class PlayerInput
+public static class PlayerInput // support keyboard and controller
 {
-    public static bool PressedJump() => Input.GetKeyDown(KeyCode. Space);
-    public static bool HoldingJump() => Input.GetKey(KeyCode. Space);
-    public static bool MovingLeft() => Input.GetKey(KeyCode. A);
-    public static bool MovingRight() => Input.GetKey(KeyCode. D);
-    public static bool PressedAttack() => Input.GetButtonDown("Fire1");
+    public static bool PressedJump() => Input.GetKeyDown(KeyCode. Space) || Input.GetButtonDown("Jump");
+    public static bool HoldingJump() => Input.GetKey(KeyCode. Space) || Input.GetButton("Jump");
+    public static bool MovingLeft() => Input.GetKey(KeyCode. A) || Input.GetAxis("Horizontal") < -0.15f;
+    public static bool MovingRight() => Input.GetKey(KeyCode. D) || Input.GetAxis("Horizontal") > 0.15f;
+    public static bool PressedAttack() => Input.GetMouseButtonDown(1) || Input.GetButtonDown("Attack");
 }
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(SpriteRenderer))]
 public class PlayerMovement : MonoBehaviour
 {
     Rigidbody2D rb2d;
     Animator anim;
+    SpriteRenderer spriteRenderer;
 
-    [SerializeField] Vector2 groundCheckSize;
-    [SerializeField] Transform playerFoot;
+    [SerializeField] Vector2 groundCheckSize, hurtBoxSize;
+    [SerializeField] Transform playerFoot, leftHitCenter, rightHitCenter;
+    [SerializeField] AnimationClip attackClip;
 
     void Start()
     {
@@ -29,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
 
         rb2d = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -36,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
         if (PlayerManager.Instance.IsDead()) return;
 
         Move();
+        Attack();
     }
 
     bool isGrounded()
@@ -55,15 +62,30 @@ public class PlayerMovement : MonoBehaviour
         if (PlayerInput.MovingRight()) velx = PlayerManager.Instance.moveSpeed;
         else if (PlayerInput.MovingLeft()) velx = -PlayerManager.Instance.moveSpeed;
 
+        if (velx != 0) spriteRenderer.flipX = velx < 0;
+
         rb2d.linearVelocity = new Vector2(velx, rb2d.linearVelocityY);
+
+        anim.SetFloat("speed", Mathf.Abs(velx));
         
         PlayerManager.Instance.grounded = isGrounded();
+        anim.SetBool("grounded", PlayerManager.Instance.grounded);
+        anim.SetBool("attacking", PlayerManager.Instance.attacking);
 
         if (isGrounded())
         {
-            PlayerManager.Instance.falling = false;
+            if (PlayerManager.Instance.falling)
+            {
+                PlayerManager.Instance.falling = false;
+
+                if (!PlayerManager.Instance.attacking)
+                    anim.Play("landing");
+            }
+
             if (PlayerInput.PressedJump())
             {
+                if (!PlayerManager.Instance.attacking)
+                    anim.Play("jump");
                 rb2d.linearVelocity = new Vector2(rb2d.linearVelocityX, PlayerManager.Instance.jumpForce);
             }
         } else
@@ -86,10 +108,54 @@ public class PlayerMovement : MonoBehaviour
             }
     }
 
+    void AttackFinished()
+    {
+        PlayerManager.Instance.attacking = false;
+    }
+    public void HurtNearbyEnemies() // Animation Event
+    {
+        // Debug.Log("Attack Animation Event Triggered!");
+        // based on player sprite original orientation
+        Vector2 center = (spriteRenderer.flipX) ? (Vector2)leftHitCenter.position : (Vector2)rightHitCenter.position;
+
+        var hitObjects = Physics2D.OverlapBoxAll(
+            center,
+            hurtBoxSize,
+            0,
+            PlayerManager.Instance.enemyLayer
+        );
+
+        foreach (var hitObj in hitObjects)
+        {
+            IEnemy enemy = hitObj.GetComponent<IEnemy>();
+            if (enemy != null)
+            {
+                // Debug.Log($"Landed Attack on -> {hitObj.transform.name}");
+                enemy.TakeDamage(PlayerManager.Instance.attackDamage);
+            }
+        }
+    }
+    void Attack()
+    {
+        if (spriteRenderer == null) return;
+
+        if (PlayerInput.PressedAttack() && !PlayerManager.Instance.attacking)
+        {
+            PlayerManager.Instance.attacking = true;
+            anim.Play("attack");
+            RunAfter evt = new RunAfter(attackClip.length * 0.85f, AttackFinished);
+        }
+    }
+
     void OnDrawGizmos()
     {
         if (playerFoot == null) return;
         Gizmos.color = Color.yellow;
-        Gizmos.DrawCube(playerFoot.position, groundCheckSize);
+        Gizmos.DrawWireCube(playerFoot.position, groundCheckSize);
+
+        if (leftHitCenter == null || rightHitCenter == null) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(leftHitCenter.position, hurtBoxSize);
+        Gizmos.DrawWireCube(rightHitCenter.position, hurtBoxSize);
     }
 }//EndScript

@@ -64,13 +64,19 @@ public class PlayerManager : Singleton<PlayerManager>
         {
             health = 0;
             isDead = true;
-        }
+            if (playerAnimator != null)
+                playerAnimator.Play("death");
+        } else
+            {
+                playerAnimator.Play("hurt");
+            }
     }
 
     [Header("Player States")]
     public bool grounded;
     public bool huggingWall;
     public bool gamePaused;
+    public bool attacking = false;
     public bool falling = false;
     bool isDead = false;
 
