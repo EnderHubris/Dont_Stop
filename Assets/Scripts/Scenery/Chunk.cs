@@ -25,6 +25,9 @@ public class Chunk : MonoBehaviour
 
     [Header("Metadata")]
     public bool isOrigin = false;
+    [SerializeField] int spawnCount = 3;
+    [SerializeField] int enemyCount; // inspector var
+    [SerializeField] Transform enemyGroup;
 
     [HideInInspector] public Chunk child = null;
     [HideInInspector] public Chunk parent = null;
@@ -79,6 +82,8 @@ public class Chunk : MonoBehaviour
             bottomNeighbor.SetTopNeighbor(this);
         }
         else Debug.LogWarning("Bottom Point is not set!");
+
+        SpawnEnemies();
     }
 
     void LateUpdate()
@@ -155,8 +160,38 @@ public class Chunk : MonoBehaviour
     public Chunk GetTopNeighbor() => topNeighbor;
     public Chunk GetBottomNeighbor() => bottomNeighbor;
 
+    // spawn in n random enemies from a given array
+    void SpawnEnemies()
+    {
+        if (enemyGroup == null) return; // no enemies within this chunk
+
+        List<GameObject> enemies = new List<GameObject>();
+        for (int i = 0; i < enemyGroup.childCount; ++i)
+            enemies.Add(enemyGroup.GetChild(i).gameObject);
+
+        if (enemies.Count == 0) return; // avoid divide by zero
+
+        // ensure spawnCount is within bounds of enemies
+        spawnCount = spawnCount % enemies.Count;
+
+        List<int> picked = new List<int>();
+        for (int i = 0; i < spawnCount;)
+        {
+            int k = Random.Range(0, enemies.Count) % enemies.Count;
+            if (picked.Contains(k)) continue;
+            picked.Add(k);
+            enemies[k].SetActive(true);
+            ++i;
+        }
+    }
+
     public void Delete()
     {
         Destroy(gameObject, 0.15f); // give time-slice to return data
+    }
+
+    void OnDrawGizmos()
+    {
+        enemyCount = (enemyGroup != null) ? enemyGroup.childCount : 0;
     }
 }//EndScript
