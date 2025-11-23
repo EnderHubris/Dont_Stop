@@ -15,7 +15,6 @@ public class Flame : MonoBehaviour
     void Start()
     {
         anim = GetComponent<Animator>();
-        anim.SetFloat("flameType", flameType);
         ChangeGradientIndex();
     }
 
@@ -27,6 +26,7 @@ public class Flame : MonoBehaviour
 
     void Update()
     {
+        anim.SetFloat("flameType", flameType);
         UpdateFlameColor();
     }
 
