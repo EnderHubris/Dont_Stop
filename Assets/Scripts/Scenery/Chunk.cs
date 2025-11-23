@@ -81,6 +81,14 @@ public class Chunk : MonoBehaviour
         else Debug.LogWarning("Bottom Point is not set!");
     }
 
+    void LateUpdate()
+    {
+        // ensure active objects that are too far away are disabled
+        float distFromPlayer = Vector3.Distance(PlayerManager.Instance.transform.position, transform.position);
+        if (distFromPlayer >= ChunkManager.Instance.GetMaxRenderDistance())
+            if (gameObject.activeSelf) DisableChunk();
+    }
+
     // Randomly pick and spawn a chunk using a desired list of chunks and spawn point
     Chunk SpawnNeighborChunk(ref List<GameObject> chunks, Vector3 spawnPosition)
     {
