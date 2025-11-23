@@ -17,6 +17,8 @@ public class Mushroom : MonoBehaviour, IEnemy
     bool jumped = false;
     bool useRunVel = true;
 
+    bool lookingLeft = false;
+
     [SerializeField] Vector2 groundCheckSize, hurtBoxSize;
     [SerializeField] Transform foot, leftHitCenter, rightHitCenter;
     [SerializeField] int health = 50, damage = 10;
@@ -96,6 +98,9 @@ public class Mushroom : MonoBehaviour, IEnemy
     void Move()
     {
         anim.SetBool("grounded", isGrounded());
+
+        if (rb2d.linearVelocityX < 0) lookingLeft = true;
+        else if (rb2d.linearVelocityX > 0) lookingLeft = false;
 
         if (isGrounded())
         {
@@ -202,7 +207,7 @@ public class Mushroom : MonoBehaviour, IEnemy
     }
     public void CheckHurtBox() // Animation Event
     {
-        Vector2 center = (spriteRenderer.flipX) ? (Vector2)rightHitCenter.position : (Vector2)leftHitCenter.position;
+        Vector2 center = (!lookingLeft) ? (Vector2)rightHitCenter.position : (Vector2)leftHitCenter.position;
 
         var hitObject = Physics2D.OverlapBox(
             center,
