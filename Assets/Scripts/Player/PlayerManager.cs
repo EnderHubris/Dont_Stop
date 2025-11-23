@@ -55,7 +55,7 @@ public class PlayerManager : Singleton<PlayerManager>
     [SerializeField] Animator playerAnimator;
 
     [Header("Player Stats")]
-    public float moveSpeed = 4, jumpForce = 3, gravityMultiplier = 2;
+    public float moveSpeed = 4, jumpForce = 3, gravityMultiplier = 2, launchPadMultiplier = 2.5f;
     public int attackDamage = 10;
     [SerializeField] int health = 100;
 

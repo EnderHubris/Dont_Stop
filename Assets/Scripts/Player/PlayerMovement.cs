@@ -86,7 +86,9 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (!PlayerManager.Instance.attacking)
                     anim.Play("jump");
-                rb2d.linearVelocity = new Vector2(rb2d.linearVelocityX, PlayerManager.Instance.jumpForce);
+                    
+                float velY = PlayerManager.Instance.jumpForce * PlayerManager.Instance.launchPadMultiplier;
+                rb2d.linearVelocity = new Vector2(rb2d.linearVelocityX, velY);
             }
         } else
             {
