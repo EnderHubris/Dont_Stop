@@ -46,7 +46,11 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (PlayerManager.Instance.IsDead()) return;
+        if (PlayerManager.Instance.IsDead())
+        {
+            rb2d.linearVelocityX = 0;
+            return;
+        }
 
         Move();
         Attack();

@@ -22,7 +22,7 @@ public class Batty : MonoBehaviour, IEnemy
 
     [SerializeField] Vector2 hurtBoxSize;
     [SerializeField] Transform leftHitCenter, rightHitCenter;
-    [SerializeField] int health = 50, damage = 10, auraGain = 5;
+    [SerializeField] int health = 50, damage = 10, auraGain = 5, pointCost = 10;
 
     [SerializeField] float moveSpeed = 4f, eyeSight = 4f, stoppingDistance = 1f;
     [SerializeField] float attackChance = 0.3f;
@@ -169,6 +169,7 @@ public class Batty : MonoBehaviour, IEnemy
     RunAfter effectAfter;
     public void Ignite()
     {
+        if (isDead) return;
         if (effectActive) return;
         if (effectAnim != null) effectAnim.Play("ignite");
 
@@ -180,6 +181,7 @@ public class Batty : MonoBehaviour, IEnemy
     {
         while (effectActive)
         {
+            if (isDead) return;
             TakeDamage(3, false);
             await Task.Delay(delay);
         }
@@ -196,12 +198,20 @@ public class Batty : MonoBehaviour, IEnemy
         PlayerManager.Instance.GainAura(auraGain);
         
         health -= amount;
-        alerted = true;
+        if (!alerted)
+        {
+            anim.Play("wake_up");
+            wakeUpEvt = new RunAfter(anim.GetCurrentAnimatorClipInfo(0)[0].clip.length, WakeUp);
+        }
         
         if (health <= 0)
         {
+            PlayerManager.Instance.GainPoints(pointCost);
+
             if (effectAfter != null) effectAfter.Stop();
             EndEffect();
+
+            PlayerHUD.Instance.GainTime(10);
 
             health = 0;
             anim.Play("death");

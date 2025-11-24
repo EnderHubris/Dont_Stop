@@ -6,9 +6,9 @@ using UnityEngine.UI;
 
 public class PlayerHUD : Singleton<PlayerHUD>
 {
-    [SerializeField] Image healthBar, auraBar;
-    [SerializeField] Gradient healthGradient, auraGradient;
-    [SerializeField] Text timerDisplay;
+    [SerializeField] Image healthBar, auraBar, levelBar;
+    [SerializeField] Gradient healthGradient, auraGradient, levelGradient;
+    [SerializeField] Text timerDisplay, levelDisplay;
     [SerializeField] float remainingTime = 90f;
     [SerializeField] Animator popup_text;
 
@@ -21,6 +21,7 @@ public class PlayerHUD : Singleton<PlayerHUD>
     {
         UpdateHealthBar();
         UpdateAuraBar();
+        UpdateLevelBar();
     }
 
     void UpdateHealthBar()
@@ -52,15 +53,37 @@ public class PlayerHUD : Singleton<PlayerHUD>
         else
             auraBar.transform.localScale = nScale;
     }
+    
+    void UpdateLevelBar()
+    {
+        float x = PlayerManager.Instance.GetLevelProgress();
+        Vector3 nScale = new Vector3(x, 1, 1);
+
+        levelBar.color = Color.Lerp(levelBar.color, levelGradient.Evaluate(x), 10 * Time.deltaTime);
+
+        float dist = Vector3.Distance(levelBar.transform.localScale, nScale);
+        
+        if (dist > 0.1f)
+            levelBar.transform.localScale = Vector3.Lerp(levelBar.transform.localScale, nScale, 10 * Time.deltaTime);
+        else
+            levelBar.transform.localScale = nScale;
+    }
+    public void UpdateLevelDisplay()
+    {
+        levelDisplay.text = PlayerManager.Instance.GetLevel().ToString();
+    }
 
     async Task UpdateTimeDisplay()
     {
         while (remainingTime > 0)
         {
-            remainingTime -= Time.deltaTime;
+            --remainingTime;
             ShowRemainingTime();
             await Task.Delay(1000);
         }
+
+        // player died from running out of time
+        PlayerManager.Instance.InstantKill();
         remainingTime = 0;
     }
     void ShowRemainingTime()
@@ -71,6 +94,10 @@ public class PlayerHUD : Singleton<PlayerHUD>
 
         string timerString = $"{minutes:00}:{seconds:00}";
         timerDisplay.text = timerString;
+    }
+    public void GainTime(int amount)
+    {
+        remainingTime += amount;
     }
 
     bool warningShown = false;

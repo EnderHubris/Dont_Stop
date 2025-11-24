@@ -58,8 +58,15 @@ public class PlayerManager : Singleton<PlayerManager>
     public float moveSpeed = 4, jumpForce = 3, gravityMultiplier = 2, launchPadMultiplier = 2.5f;
     public int attackDamage = 10;
     public float targetRange = 3f;
+    
     int maxHealth = 100;
     int maxAura = 100;
+
+    int totalPoints = 0;
+    int points = 0;
+    int pointRequirement = 100;
+    int level = 1;
+
     [SerializeField] int health = 100, aura = 0;
 
     RunAfter evt;
@@ -75,7 +82,11 @@ public class PlayerManager : Singleton<PlayerManager>
 
     public float GetHealthPercent() => Mathf.Clamp01((float)health / (float)maxHealth);
     public float GetAuraPercent() => Mathf.Clamp01((float)aura / (float)maxAura);
+    // get percent in decimal form of progress from 0-1
+    public float GetLevelProgress() => Mathf.Clamp01((float)points / (float)pointRequirement);
     public int GetAuraAmount() => aura;
+    // get level number value used in displaying to the screen
+    public int GetLevel() => level;
 
     public void GainHealth(float amount)
     {
@@ -88,6 +99,19 @@ public class PlayerManager : Singleton<PlayerManager>
     {
         aura += amount;
         if (aura >= maxAura) aura = maxAura;
+    }
+    public void GainPoints(int amount)
+    {
+        totalPoints += amount;
+        points += amount;
+
+        if (points >= pointRequirement)
+        {
+            ++level;
+            points = 0;
+            pointRequirement = (int)Mathf.Ceil((float)pointRequirement * 1.5f);
+            PlayerHUD.Instance.UpdateLevelDisplay();
+        }
     }
 
     public void TakeDamage(int amount)
@@ -105,6 +129,13 @@ public class PlayerManager : Singleton<PlayerManager>
             {
                 playerAnimator.Play("hurt");
             }
+    }
+    public void InstantKill()
+    {
+        health = 0;
+        isDead = true;
+        if (playerAnimator != null)
+            playerAnimator.Play("death");
     }
     public void ConsumeAura(int amount)
     {

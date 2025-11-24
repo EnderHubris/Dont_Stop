@@ -24,7 +24,7 @@ public class Mushroom : MonoBehaviour, IEnemy
     [SerializeField] Vector2 groundCheckSize, hurtBoxSize;
     [SerializeField] Transform foot, leftHitCenter, rightHitCenter;
     int maxHealth = 50;
-    [SerializeField] int health = 50, damage = 10, auraGain = 5;
+    [SerializeField] int health = 50, damage = 10, auraGain = 5, pointCost = 10;
 
     [SerializeField] float moveSpeed = 4f, gravityMultiplier = 1.5f, eyeSight = 4f, jumpForce = 4f, stoppingDistance = 1f;
     [SerializeField] float jumpChance = 0.3f, attackChance = 0.3f;
@@ -242,6 +242,7 @@ public class Mushroom : MonoBehaviour, IEnemy
 
         health = maxHealth * 2;
         damage *= 2;
+        pointCost = (int)Mathf.Ceil((float)pointCost * 1.5f);
         auraGain = 0;
 
         new RunAfter(anim.GetCurrentAnimatorClipInfo(0)[0].clip.length * 0.85f, ReviveFinished);
@@ -252,6 +253,7 @@ public class Mushroom : MonoBehaviour, IEnemy
     RunAfter effectAfter;
     public void Ignite()
     {
+        if (isDead) return;
         if (effectActive) return;
         if (effectAnim != null) effectAnim.Play("ignite");
 
@@ -263,6 +265,7 @@ public class Mushroom : MonoBehaviour, IEnemy
     {
         while (effectActive)
         {
+            if (isDead) return;
             TakeDamage(3, false);
             await Task.Delay(delay);
         }
@@ -273,6 +276,7 @@ public class Mushroom : MonoBehaviour, IEnemy
     }
 
     int afterDeathHits = 0;
+    bool enraged = false;
     public void TakeDamage(int amount, bool getAura)
     {
         PlayerManager.Instance.GainAura(auraGain);
@@ -283,6 +287,7 @@ public class Mushroom : MonoBehaviour, IEnemy
             if (afterDeathHits == 5)
             {
                 Resurrect();
+                enraged = true;
             }
             return;
         }
@@ -292,6 +297,13 @@ public class Mushroom : MonoBehaviour, IEnemy
         
         if (health <= 0)
         {
+            PlayerManager.Instance.GainPoints(pointCost);
+            
+            if (effectAfter != null) effectAfter.Stop();
+            EndEffect();
+
+            PlayerHUD.Instance.GainTime((!enraged) ? 10 : 35);
+
             health = 0;
             anim.Play("death");
             resurrectedVfx.Play("idle");
