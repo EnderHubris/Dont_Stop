@@ -147,7 +147,28 @@ public class Chunk : MonoBehaviour
         if (collider2d.GetComponent<PlayerManager>() != null)
         {
             ChunkManager.Instance.Signal(this);
+        } else if (collider2d.GetComponent<IEnemy>() != null)
+        {
+            RelocateEnemy(collider2d.transform);
         }
+    }
+
+    void RelocateEnemy(Transform enemy)
+    {
+        // make holder object if it doesnt exist
+        Transform enemyHolder = transform.Find("RelocatedEnemies");
+        if (enemyHolder == null)
+        {
+            GameObject go = new GameObject("RelocatedEnemies");
+            go.transform.SetParent(transform);
+            go.transform.localPosition = Vector3.zero;
+            go.transform.localRotation = Quaternion.identity;
+            go.transform.localScale = Vector3.one;
+            enemyHolder = go.transform;
+        }
+
+        // move enemies to object so they persist if their origin chunk is disabled
+        enemy.SetParent(enemyHolder);
     }
 
     public void SetLeftNeighbor(Chunk chunk) { if (leftNeighbor == null) leftNeighbor = chunk; }
