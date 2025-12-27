@@ -10,7 +10,7 @@ public abstract class Ability : ScriptableObject
     [SerializeField] protected int cost;
     [SerializeField] protected float delay;
     [SerializeField] protected Sprite icon;
-    [SerializeField] protected string name;
+    [SerializeField] protected string AbilityName;
     [SerializeField] Color baseColor;
 
     // shared method between derived classes
@@ -22,69 +22,10 @@ public abstract class Ability : ScriptableObject
 
     public Color GetBaseColor() => baseColor;
     public Sprite GetIconSprite() => icon;
-    public string GetName() => name;
+    public string GetName() => AbilityName;
 
     // derived classes must implement this function
     public abstract void Perform();
-}
-
-[CreateAssetMenu(menuName = "Abilities/Healing")]
-public class Healing : Ability
-{
-    [SerializeField] [Range(0f,1f)] float healAmount = 0.35f;
-
-    public override void Perform()
-    {
-        if (EnoughAura())
-        {
-            PlayerManager.Instance.ConsumeAura(cost);
-            new RunAfter(delay, GiveHealth);
-        }
-    }
-    void GiveHealth()
-    {
-        PlayerManager.Instance.GainHealth(healAmount);
-    }
-}
-
-[CreateAssetMenu(menuName = "Abilities/Blaze")]
-public class Blaze : Ability
-{
-    [SerializeField] float duration = 2f;
-
-    public override void Perform()
-    {
-        if (EnoughAura())
-        {
-            PlayerManager.Instance.ConsumeAura(cost);
-            new RunAfter(delay, BlazeBlast);
-        }
-    }
-    Collider2D[] FindTargets()
-    {
-        Vector3 playerPosition = PlayerManager.Instance.transform.position;
-
-        Collider2D[] targets = Physics2D.OverlapCircleAll(
-            playerPosition,
-            PlayerManager.Instance.targetRange,
-            PlayerManager.Instance.enemyLayer
-        );
-
-        return targets;
-    }
-    void BlazeBlast()
-    {
-        Collider2D[] targets = FindTargets();
-        foreach (Collider2D target in targets)
-        {
-            IEnemy enemy = target.GetComponent<IEnemy>();
-            if (enemy != null)
-            {
-                if (!enemy.IsDead())
-                    enemy.Ignite();
-            }
-        }
-    }
 }
 
 [RequireComponent(typeof(Animator))]
