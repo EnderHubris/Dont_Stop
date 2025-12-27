@@ -1,23 +1,27 @@
 using Utilities;
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public static class PlayerInput // support keyboard and controller
 {
+    // new unity input system usage
+    static Gamepad gamepad = Gamepad.current;
+    
     public static bool PressedJump() => Input.GetKeyDown(KeyCode. Space) || Input.GetButtonDown("Jump");
     public static bool HoldingJump() => Input.GetKey(KeyCode. Space) || Input.GetButton("Jump");
 
     public static bool MovingLeft() => Input.GetKey(KeyCode. A) || Input.GetAxis("Left_Stick_Horizontal") < -0.15f;
     public static bool MovingRight() => Input.GetKey(KeyCode. D) || Input.GetAxis("Left_Stick_Horizontal") > 0.15f;
     
-    public static bool PressedAttack() => Input.GetMouseButtonDown(1) || Input.GetButtonDown("Attack");
+    public static bool PressedAttack() => Input.GetMouseButtonDown(0) || Input.GetButtonDown("Attack");
 
     public static bool PressedBack() => Input.GetKey(KeyCode. Escape) || Input.GetButtonDown("B");
 
-    // public static bool PressedPrevSkill() => Input.GetKeyDown(KeyCode. Q) || Input.GetButtonDown("LeftBumper");
-    // public static bool PressedNextSkill() => Input.GetKeyDown(KeyCode. E) || Input.GetButtonDown("RightBumper");
+    public static bool PressedPrevSkill() => Input.GetKeyDown(KeyCode. Q) || (gamepad != null && gamepad.dpad.left.wasPressedThisFrame);
+    public static bool PressedNextSkill() => Input.GetKeyDown(KeyCode. E) || (gamepad != null && gamepad.dpad.right.wasPressedThisFrame);
 
-    public static bool PressedSkillButton() => Input.GetKeyDown(KeyCode. F) || Input.GetButtonDown("SkillUse");
+    public static bool PressedSkillButton() => Input.GetMouseButtonDown(1) || Input.GetButtonDown("SkillUse");
 }
 
 [RequireComponent(typeof(Animator))]

@@ -50,20 +50,15 @@ public class AuraAbilities : MonoBehaviour
         if (abilities.Length == 0) return;
         if (abilityVfx == null) return;
 
-        // new unity input system usage
-        var gamepad = Gamepad.current;
-        if (gamepad != null)
+        if (PlayerInput.PressedPrevSkill())
         {
-            if (gamepad.dpad.left.wasPressedThisFrame)
+            Debug.Log("Pressed L-DPAD");
+            selected = (selected - 1 + abilities.Length) % abilities.Length;
+        } else if (PlayerInput.PressedNextSkill())
             {
-                Debug.Log("Pressed L-DPAD");
-                selected = (selected - 1 + abilities.Length) % abilities.Length;
-            } else if (gamepad.dpad.right.wasPressedThisFrame)
-                {
-                    Debug.Log("Pressed R-DPAD");
-                    selected = ++selected % abilities.Length;
-                }
-        }
+                Debug.Log("Pressed R-DPAD");
+                selected = ++selected % abilities.Length;
+            }
 
         UpdateIcon();
 

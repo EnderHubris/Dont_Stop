@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] Animator screenCover;
-    [SerializeField] GameObject btnGroup, mainGroup, settingsGroup;
+    [SerializeField] GameObject btnGroup, mainGroup, settingsGroup, creditsGroup;
     [SerializeField] GameObject pcControls, controllerControls;
     public UnityEngine.InputSystem.PlayerInput playerInput;
     bool usingController = false;
@@ -71,7 +71,7 @@ public class MainMenu : MonoBehaviour
                 }
             } else
                 {
-                    if (PlayerInput.PressedBack()) OpenMain();
+                    if (!mainGroup.activeInHierarchy && PlayerInput.PressedBack()) OpenMain();
                 }
         }
     }
@@ -98,12 +98,21 @@ public class MainMenu : MonoBehaviour
     {
         mainGroup.SetActive(true);
         settingsGroup.SetActive(false);
+        creditsGroup.SetActive(false);
     }
 
     public void OpenSettings()
     {
         mainGroup.SetActive(false);
         settingsGroup.SetActive(true);
+        creditsGroup.SetActive(false);
+    }
+
+    public void OpenCredits()
+    {
+        mainGroup.SetActive(false);
+        settingsGroup.SetActive(false);
+        creditsGroup.SetActive(true);
     }
 
     public void ExitGame() { Application.Quit(); }

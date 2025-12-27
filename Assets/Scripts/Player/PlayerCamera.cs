@@ -129,7 +129,7 @@ public class PlayerCamera : MonoBehaviour
     int btnIndex = 0;
     void MenuInteraction()
     {
-        if (DeathScreen.activeInHierarchy)
+        if (PlayerManager.Instance.usingController && DeathScreen.activeInHierarchy)
         {
             // new unity input system usage
             var gamepad = Gamepad.current;

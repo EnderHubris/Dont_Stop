@@ -1,6 +1,7 @@
 using Utilities;
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System.Threading.Tasks;
 
 // universal Singleton template object
@@ -123,7 +124,6 @@ public class PlayerManager : Singleton<PlayerManager>
         if (health <= 0)
         {
             health = 0;
-            isDead = true;
             Death();
         } else
             {
@@ -133,11 +133,13 @@ public class PlayerManager : Singleton<PlayerManager>
     public void InstantKill()
     {
         health = 0;
-        isDead = true;
         Death();
     }
     void Death()
     {
+        if (isDead) return;
+        isDead = true;
+
         if (playerAnimator != null)
                 playerAnimator.Play("death");
                 
@@ -182,8 +184,21 @@ public class PlayerManager : Singleton<PlayerManager>
     public LayerMask obstacleLayer;
     public LayerMask enemyLayer;
 
+    UnityEngine.InputSystem.PlayerInput playerInput;
+
+    void Awake()
+    {
+        playerInput = GetComponent<UnityEngine.InputSystem.PlayerInput>();
+    }
+
     void Start()
     {
         maxHealth = health;
+    }
+
+    public bool usingController = false;
+    void OnControlsChanged(UnityEngine.InputSystem.PlayerInput input)
+    {
+        usingController = input.currentControlScheme == "Gamepad";
     }
 }
