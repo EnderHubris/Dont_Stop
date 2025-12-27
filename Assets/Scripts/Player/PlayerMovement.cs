@@ -12,6 +12,8 @@ public static class PlayerInput // support keyboard and controller
     
     public static bool PressedAttack() => Input.GetMouseButtonDown(1) || Input.GetButtonDown("Attack");
 
+    public static bool PressedBack() => Input.GetKey(KeyCode. Escape) || Input.GetButtonDown("B");
+
     // public static bool PressedPrevSkill() => Input.GetKeyDown(KeyCode. Q) || Input.GetButtonDown("LeftBumper");
     // public static bool PressedNextSkill() => Input.GetKeyDown(KeyCode. E) || Input.GetButtonDown("RightBumper");
 
