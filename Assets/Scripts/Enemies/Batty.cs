@@ -22,7 +22,7 @@ public class Batty : MonoBehaviour, IEnemy
 
     [SerializeField] Vector2 hurtBoxSize;
     [SerializeField] Transform leftHitCenter, rightHitCenter;
-    [SerializeField] int health = 50, damage = 10, auraGain = 5, pointCost = 10;
+    [SerializeField] int health = 50, damage = 10, auraGain = 5, pointCost = 10, timeGain = 2;
 
     [SerializeField] float moveSpeed = 4f, eyeSight = 4f, stoppingDistance = 1f;
     [SerializeField] float attackChance = 0.3f;
@@ -211,7 +211,7 @@ public class Batty : MonoBehaviour, IEnemy
             if (effectAfter != null) effectAfter.Stop();
             EndEffect();
 
-            PlayerHUD.Instance.GainTime(10);
+            PlayerHUD.Instance.GainTime(timeGain);
 
             health = 0;
             anim.Play("death");

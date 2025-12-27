@@ -22,7 +22,7 @@ public class Skeleton : MonoBehaviour, IEnemy
     [SerializeField] Vector2 groundCheckSize, hurtBoxSize;
     [SerializeField] Transform foot, leftHitCenter, rightHitCenter;
     int maxHealth = 50;
-    [SerializeField] int health = 50, damage = 10, auraGain = 5, pointCost = 10;
+    [SerializeField] int health = 50, damage = 10, auraGain = 5, pointCost = 10, timeGain = 2;
 
     [SerializeField] float moveSpeed = 4f, gravityMultiplier = 1.5f, eyeSight = 4f, jumpForce = 4f, stoppingDistance = 1f;
     [SerializeField] float jumpChance = 0.3f, attackChance = 0.3f;
@@ -301,7 +301,7 @@ public class Skeleton : MonoBehaviour, IEnemy
             if (effectAfter != null) effectAfter.Stop();
             EndEffect();
 
-            PlayerHUD.Instance.GainTime((!enraged) ? 10 : 35);
+            PlayerHUD.Instance.GainTime((!enraged) ? timeGain : timeGain * 2);
 
             health = 0;
             anim.Play("death");
