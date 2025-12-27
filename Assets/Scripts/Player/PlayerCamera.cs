@@ -48,23 +48,23 @@ public class PlayerCamera : MonoBehaviour
             {
                 ShowBossView();
             } else
-            {
-                // strength = (PlayerManager.Instance.grounded) ? 1 : 0;
-                if (PlayerManager.Instance.grounded)
                 {
-                    lastCameraPos = new Vector2(0, Camera.main.transform.position.y + 1f);
-                    strength = 1;
-                } else
+                    // strength = (PlayerManager.Instance.grounded) ? 1 : 0;
+                    if (PlayerManager.Instance.grounded)
                     {
-                        lastCameraPos.x = playerCenter.position.x;
-                        float remainingDistance = Vector2.Distance(lastCameraPos, playerCenter.position);
-                        if (remainingDistance < 0.1f && strength == 1)
+                        lastCameraPos = new Vector2(0, Camera.main.transform.position.y + 1f);
+                        strength = 1;
+                    } else
                         {
-                            strength = 0;
+                            lastCameraPos.x = playerCenter.position.x;
+                            float remainingDistance = Vector2.Distance(lastCameraPos, playerCenter.position);
+                            if (remainingDistance < 0.1f && strength == 1)
+                            {
+                                strength = 0;
+                            }
                         }
-                    }
-                FollowPlayer();
-            }
+                    FollowPlayer();
+                }
 
             await Task.Yield();
         }

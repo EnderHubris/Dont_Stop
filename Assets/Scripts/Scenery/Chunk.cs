@@ -27,6 +27,8 @@ public class Chunk : MonoBehaviour
 
     [Header("Metadata")]
     public bool isOrigin = false;
+    bool fightTriggered = false;
+    bool bossKilled = false;
     [SerializeField] int spawnCount = 3;
     [SerializeField] int enemyCount; // inspector var
     [SerializeField] Transform enemyGroup;
@@ -100,18 +102,12 @@ public class Chunk : MonoBehaviour
             IEnemy bossEnemy = boss.GetComponent<IEnemy>();
             if (bossEnemy != null)
             {
-                if (bossEnemy.IsDead())
+                if (!bossKilled && bossEnemy.IsDead())
                 {
                     BossFightEnded();
                 }
             }
         }
-    }
-    void BossFightEnded()
-    {
-        border.SetActive(false);
-        PlayerManager.Instance.inBossFight = false;
-        PlayerManager.Instance.AttachCamera();
     }
 
     void LateUpdate()
@@ -175,7 +171,7 @@ public class Chunk : MonoBehaviour
         if (collider2d.GetComponent<PlayerManager>() != null)
         {
             ChunkManager.Instance.Signal(this);
-            if (bossChunk) PrepareBossFight();
+            if (bossChunk && !fightTriggered) PrepareBossFight();
         } else if (collider2d.GetComponent<IEnemy>() != null)
         {
             RelocateEnemy(collider2d.transform);
@@ -184,8 +180,17 @@ public class Chunk : MonoBehaviour
 
     void PrepareBossFight()
     {
+        fightTriggered = true;
+        
         if (border != null) border.SetActive(true);
-        if (bossViewPoint != null) PlayerManager.Instance.SetBossViewPoint(bossViewPoint.position);
+
+        if (bossViewPoint != null)
+        {
+            PlayerManager.Instance.SetBossViewPoint(bossViewPoint.position);
+        } else
+            {
+                Debug.LogError($"bossViewPoint is not set for this Object [{transform.name}]");
+            }
 
         PlayerManager.Instance.DetachCamera();
         PlayerManager.Instance.inBossFight = true;
@@ -199,6 +204,14 @@ public class Chunk : MonoBehaviour
         {
             boss.GetComponent<IBoss>().StartFight();
         }
+    }
+    
+    void BossFightEnded()
+    {
+        bossKilled = true;
+        border.SetActive(false);
+        PlayerManager.Instance.inBossFight = false;
+        PlayerManager.Instance.AttachCamera();
     }
 
     void RelocateEnemy(Transform enemy)
