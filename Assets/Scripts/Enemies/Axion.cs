@@ -214,7 +214,6 @@ public class Axion : MonoBehaviour, IEnemy, IBoss
                     anim.Play("pre-attack");
 
                     AnimationClip attackClip = anim.GetCurrentAnimatorClipInfo(0)[0].clip;
-                    RunAfter evt = new RunAfter(attackClip.length * 0.85f, AttackFinished);
 
                 }
             }
