@@ -375,7 +375,7 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
             isDead = true;
         } else
             {
-                anim.Play("hurt");
+                if (!attacking) anim.Play("hurt");
             }
     }
     public bool IsDead() => isDead;

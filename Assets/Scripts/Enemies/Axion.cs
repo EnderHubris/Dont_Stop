@@ -352,7 +352,7 @@ public class Axion : MonoBehaviour, IEnemy, IBoss
             isDead = true;
         } else
             {
-                anim.Play("hurt");
+                if (!attacking) anim.Play("hurt");
             }
     }
     public bool IsDead() => isDead;
