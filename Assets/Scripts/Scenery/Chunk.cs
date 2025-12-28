@@ -171,7 +171,7 @@ public class Chunk : MonoBehaviour
         if (collider2d.GetComponent<PlayerManager>() != null)
         {
             ChunkManager.Instance.Signal(this);
-            if (bossChunk && !fightTriggered) PrepareBossFight();
+            if (bossChunk && !fightTriggered && !bossKilled) PrepareBossFight();
         } else if (collider2d.GetComponent<IEnemy>() != null)
         {
             RelocateEnemy(collider2d.transform);
@@ -200,7 +200,7 @@ public class Chunk : MonoBehaviour
 
     void ActivateBoss()
     {
-        if (boss != null && boss.GetComponent<IBoss>() != null)
+        if (!bossKilled && boss != null && boss.GetComponent<IBoss>() != null)
         {
             boss.GetComponent<IBoss>().StartFight();
         }
