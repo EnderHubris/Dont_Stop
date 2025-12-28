@@ -27,12 +27,13 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
     int maxHealth = 50;
     [SerializeField] int health = 50, damage = 10, auraGain = 5, pointCost = 10, timeGain = 10;
 
-    [SerializeField] float moveSpeed = 4f, gravityMultiplier = 1.5f, eyeSight = 4f, jumpForce = 4f, stoppingDistance = 1f;
+    [SerializeField] float moveSpeed = 4f, gravityMultiplier = 1.5f, eyeSight = 4f, jumpForce = 4f, stoppingDistance = 1f, furyDuration = 3f;
     [SerializeField] float jumpChance = 0.3f, attackChance = 0.3f;
 
     [SerializeField] LayerMask playerLayer;
     [SerializeField] Animator resurrectedVfx, effectAnim;
     [SerializeField] ParticleSystem scream;
+    [SerializeField] GameObject slash;
 
     Vector2 vel;
     Vector2 playerPos;
@@ -96,6 +97,7 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
     }
 
     RunAfter jumpCoolDown;
+    bool freezeMovement = false;
     void Move()
     {
         anim.SetBool("grounded", isGrounded());
@@ -104,7 +106,7 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
         {
             // initially stand still
             // when player is detected or an attack only injures chase the player
-            if (alerted)
+            if (!freezeMovement && alerted)
             {
                 bool moveRight = transform.position.x < playerPos.x;
 
@@ -131,7 +133,10 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
 
                 // when close to the player randomly decide to attack
                 Attack();
-            }
+            } else
+                {
+                    rb2d.linearVelocityX = 0;
+                }
 
             // apply const force incase enemy runs off a ledge/edge
             if (rb2d.linearVelocityY < 0)
@@ -186,6 +191,7 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
         attackDelay = new Sleep(3f);
     }
 
+    float t = 0;
     void Attack()
     {
         if (spriteRenderer == null || !alerted) return;
@@ -196,6 +202,7 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
         {
             if (isGrounded())
             {
+                t = 0;
                 float randValue = Random.Range(0f, 1f);
                 if ((attackDelay == null || attackDelay.Finished()) && randValue < attackChance)
                 {
@@ -210,8 +217,52 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
 
                 }
             }
-        }
+        } else
+            {
+                t += Time.deltaTime;
+                if (t > 10)
+                {
+                    SpecialAttack();
+                    t = 0;
+                }
+            }
     }
+
+    bool inFury = false;
+    void SpecialAttack()
+    {
+        // reduce spamming
+        if (inFury) return;
+        inFury = true;
+
+        scream.Play();
+        PlayerManager.Instance.CameraShake();
+
+        new RunAfter(1, FurySlashes);
+    }
+
+    void FurySlashes()
+    {
+        anim.ResetTrigger("revert");
+        anim.Play("furySlashes");
+        new RunAfter(furyDuration, AllowMovement);
+    }
+    
+    // animation target
+    void SpawnSlash()
+    {
+        Debug.Log("Spawned Slash Object");
+        Instantiate(slash, transform.position, Quaternion.identity);
+    }
+
+    void AllowMovement()
+    {
+        anim.SetTrigger("revert");
+        freezeMovement = false;
+        inFury = false;
+        t = 0;
+    }
+
     public void CheckHurtBox() // Animation Event
     {
         Vector2 center = (!spriteRenderer.flipX) ? (Vector2)rightHitCenter.position : (Vector2)leftHitCenter.position;
