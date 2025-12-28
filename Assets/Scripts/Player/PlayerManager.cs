@@ -165,6 +165,10 @@ public class PlayerManager : Singleton<PlayerManager>
     {
         if (playerCamera) playerCamera.Attach();
     }
+    public void CameraShake()
+    {
+        if (playerCamera) playerCamera.CameraShake();
+    }
 
     [Header("Player States")]
     public bool grounded;

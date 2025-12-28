@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Utilities;
@@ -30,6 +32,8 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
 
     [SerializeField] LayerMask playerLayer;
     [SerializeField] Animator resurrectedVfx, effectAnim;
+    [SerializeField] ParticleSystem scream;
+    [SerializeField] GameObject FallingSpike, FloorSpike;
 
     Vector2 vel;
     Vector2 playerPos;
@@ -177,12 +181,14 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
     }
 
     Sleep attackDelay = null;
+    Sleep specialDelay = null;
     void AttackFinished()
     {
         attacking = false;
         attackDelay = new Sleep(3f);
     }
 
+    float t = 0;
     void Attack()
     {
         if (spriteRenderer == null || !alerted) return;
@@ -191,19 +197,32 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
         float dist2Player = Vector2.Distance(transform.position, playerPos);
         if (dist2Player < stoppingDistance + 0.15f)
         {
-            float randValue = Random.Range(0f, 1f);
-            if ((attackDelay == null || attackDelay.Finished()) && randValue < attackChance)
+            if (isGrounded())
             {
-                attacking = true;
-                
-                // skeleton will attack in the right direction
-                anim.SetInteger("attackType", Random.Range(0, 2));
-                anim.Play("pre-attack");
+                t = 0;
+                float randValue = Random.Range(0f, 1f);
+                if ((attackDelay == null || attackDelay.Finished()) && randValue < attackChance)
+                {
+                    attacking = true;
+                    
+                    // skeleton will attack in the right direction
+                    anim.SetInteger("attackType", Random.Range(0, 2));
+                    anim.Play("pre-attack");
 
-                AnimationClip attackClip = anim.GetCurrentAnimatorClipInfo(0)[0].clip;
-                RunAfter evt = new RunAfter(attackClip.length * 0.85f, AttackFinished);
+                    AnimationClip attackClip = anim.GetCurrentAnimatorClipInfo(0)[0].clip;
+                    RunAfter evt = new RunAfter(attackClip.length * 0.85f, AttackFinished);
+
+                }
             }
-        }
+        } else
+            {
+                t += Time.deltaTime;
+                if (t > 10)
+                {
+                    SpecialAttack();
+                    t = 0;
+                }
+            }
     }
     public void CheckHurtBox() // Animation Event
     {
@@ -220,6 +239,54 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
             hitObject.transform.GetComponent<PlayerManager>() != null)
         {
             PlayerManager.Instance.TakeDamage(damage);
+        }
+    }
+
+    void SpecialAttack()
+    {
+        // reduce spamming
+        if (specialDelay != null && !specialDelay.Finished()) return;
+        specialDelay = new Sleep(3f);
+
+        scream.Play();
+        PlayerManager.Instance.CameraShake();
+
+        if (Random.Range(0,100) < 50)
+        {
+            new RunAfter(1, FallingSpikes);
+        } else
+            {
+                new RunAfter(1, FloorSpikes);
+            }
+    }
+
+    void FallingSpikes()
+    {
+        // spawn spikes above the player
+        StartCoroutine(SpawnFallingSpikes());
+    }
+    IEnumerator SpawnFallingSpikes()
+    {
+        for (int i = 0; i < 10; ++i)
+        {
+            Vector3 pos = PlayerManager.Instance.transform.position + new Vector3(0, 10, 0);
+            Instantiate(FallingSpike, pos, Quaternion.identity);
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    void FloorSpikes()
+    {
+        // spawn spikes on the player
+        StartCoroutine(SpawnFloorSpikes());
+    }
+    IEnumerator SpawnFloorSpikes()
+    {
+        for (int i = 0; i < 10; ++i)
+        {
+            RaycastHit2D hit2d = Physics2D.Raycast(PlayerManager.Instance.transform.position, Vector2.down, 50, PlayerManager.Instance.groundMask);
+            Instantiate(FloorSpike, hit2d.point, Quaternion.identity);
+            yield return new WaitForSeconds(1);
         }
     }
 

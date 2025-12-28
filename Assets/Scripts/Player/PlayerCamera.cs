@@ -155,6 +155,33 @@ public class PlayerCamera : MonoBehaviour
         }
     }
 
+    bool shaking = false;
+    public void CameraShake()
+    {
+        _ = Shake();
+    }
+    async Task Shake()
+    {
+        if (shaking) return;
+
+        Vector3 oPos = Camera.main.transform.position;
+        float timeElapsed = 0;
+        shaking = true;
+
+        while (timeElapsed < 2)
+        {
+            float x = UnityEngine.Random.Range(0.3f, 0.55f);
+            float y = UnityEngine.Random.Range(0.3f, 0.55f);
+
+            Camera.main.transform.position = oPos + new Vector3(x, y, oPos.z);
+            timeElapsed += Time.deltaTime;
+            await Task.Yield();
+        }
+
+        Camera.main.transform.position = oPos;
+        shaking = false;
+    }
+
     // UI Target
     public void ReturnToMenu()
     {
