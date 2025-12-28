@@ -33,6 +33,7 @@ public class Axion : MonoBehaviour, IEnemy, IBoss
     [SerializeField] LayerMask playerLayer;
     [SerializeField] Animator resurrectedVfx, effectAnim;
     [SerializeField] ParticleSystem scream;
+    [SerializeField] GameObject blast;
 
     Vector2 vel;
     Vector2 playerPos;
@@ -184,12 +185,14 @@ public class Axion : MonoBehaviour, IEnemy, IBoss
     }
 
     Sleep attackDelay = null;
+    Sleep specialDelay = null;
     void AttackFinished()
     {
         attacking = false;
         attackDelay = new Sleep(3f);
     }
 
+    float t = 0;
     void Attack()
     {
         if (spriteRenderer == null || !alerted) return;
@@ -200,6 +203,7 @@ public class Axion : MonoBehaviour, IEnemy, IBoss
         {
             if (isGrounded())
             {
+                t = 0;
                 float randValue = Random.Range(0f, 1f);
                 if ((attackDelay == null || attackDelay.Finished()) && randValue < attackChance)
                 {
@@ -214,6 +218,41 @@ public class Axion : MonoBehaviour, IEnemy, IBoss
 
                 }
             }
+        } else
+            {
+                t += Time.deltaTime;
+                if (t > 10)
+                {
+                    SpecialAttack();
+                    t = 0;
+                }
+            }
+    }
+
+    void SpecialAttack()
+    {
+        // reduce spamming
+        if (specialDelay != null && !specialDelay.Finished()) return;
+        specialDelay = new Sleep(3f);
+
+        scream.Play();
+        PlayerManager.Instance.CameraShake();
+
+        new RunAfter(1, EnergyBlasts);
+    }
+
+    void EnergyBlasts()
+    {
+        // spawn spikes on the player
+        StartCoroutine(SpawnEnergyBlasts());
+    }
+    IEnumerator SpawnEnergyBlasts()
+    {
+        for (int i = 0; i < 10; ++i)
+        {
+            RaycastHit2D hit2d = Physics2D.Raycast(PlayerManager.Instance.transform.position, Vector2.down, 50, PlayerManager.Instance.groundMask);
+            Instantiate(blast, hit2d.point, Quaternion.identity);
+            yield return new WaitForSeconds(1);
         }
     }
 
