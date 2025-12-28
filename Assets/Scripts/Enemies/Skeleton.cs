@@ -271,6 +271,7 @@ public class Skeleton : MonoBehaviour, IEnemy
     }
     void EndEffect()
     {
+        effectActive = false;
         if (effectAnim != null) effectAnim.Play("no_effect");
     }
 

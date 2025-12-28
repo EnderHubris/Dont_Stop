@@ -262,6 +262,7 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
     }
     void EndEffect()
     {
+        effectActive = false;
         if (effectAnim != null) effectAnim.Play("no_effect");
     }
 
