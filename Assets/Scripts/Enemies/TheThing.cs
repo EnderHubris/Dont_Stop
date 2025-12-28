@@ -39,6 +39,8 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
     Vector2 playerPos;
     Vector2 lookDir;
 
+    float spikeSpawnY = -1;
+
     void Start()
     {
         if (PlayerManager.Instance == null)
@@ -52,6 +54,7 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         maxHealth = health;
+        spikeSpawnY = transform.position.y + 8.5f;
 
         SetLookDir();
     }
@@ -269,7 +272,11 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
     {
         for (int i = 0; i < 10; ++i)
         {
-            Vector3 pos = PlayerManager.Instance.transform.position + new Vector3(0, 10, 0);
+            // use player position-x to spawn the spike above the player
+            Vector3 pos = PlayerManager.Instance.transform.position;
+            pos.y = spikeSpawnY; // used to keep the spike within the chunk boundary
+            pos.z = 0;
+
             Instantiate(FallingSpike, pos, Quaternion.identity);
             yield return new WaitForSeconds(1);
         }
