@@ -18,8 +18,16 @@ public static class PlayerInput // support keyboard and controller
 
     public static bool PressedBack() => Input.GetKey(KeyCode. Escape) || Input.GetButtonDown("B");
 
-    public static bool PressedPrevSkill() => Input.GetKeyDown(KeyCode. Q) || (gamepad != null && gamepad.dpad.left.wasPressedThisFrame);
-    public static bool PressedNextSkill() => Input.GetKeyDown(KeyCode. E) || (gamepad != null && gamepad.dpad.right.wasPressedThisFrame);
+    public static bool PressedPrevSkill()
+    {
+        gamepad = Gamepad.current;
+        return Input.GetKeyDown(KeyCode. Q) || (gamepad != null && gamepad.dpad.left.wasPressedThisFrame);
+    }
+    public static bool PressedNextSkill()
+    {
+        gamepad = Gamepad.current;
+        return Input.GetKeyDown(KeyCode. E) || (gamepad != null && gamepad.dpad.right.wasPressedThisFrame);
+    }
 
     public static bool PressedSkillButton() => Input.GetMouseButtonDown(1) || Input.GetButtonDown("SkillUse");
 }
