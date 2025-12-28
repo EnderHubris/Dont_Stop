@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using UnityEngine;
@@ -14,7 +16,14 @@ public class PlayerHUD : Singleton<PlayerHUD>
 
     void Start()
     {
-        _ = UpdateTimeDisplay();
+        if (Application.platform != RuntimePlatform.WebGLPlayer)
+        {
+            _ = UpdateTimeDisplay();
+        } else
+            {
+                // WebGL doesnt work well with async tasks like an executable would
+                StartCoroutine(UpdateTimeDisplayWeb());
+            }
     }
 
     void Update()
@@ -82,13 +91,30 @@ public class PlayerHUD : Singleton<PlayerHUD>
                 --remainingTime;
                 
             ShowRemainingTime();
-            await Task.Delay(1000);
+            await Task.Delay(1000); // wait 1 second
         }
 
         // player died from running out of time
         PlayerManager.Instance.InstantKill();
         remainingTime = 0;
     }
+    IEnumerator UpdateTimeDisplayWeb()
+    {
+        while (remainingTime > 0)
+        {
+            // do not consume time when in a boss fight
+            if (!PlayerManager.Instance.inBossFight)
+                --remainingTime;
+                
+            ShowRemainingTime();
+            yield return new WaitForSeconds(1f);
+        }
+
+        // player died from running out of time
+        PlayerManager.Instance.InstantKill();
+        remainingTime = 0;
+    }
+
     void ShowRemainingTime()
     {
         int totalSeconds = Mathf.FloorToInt(remainingTime);
