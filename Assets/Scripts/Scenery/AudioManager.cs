@@ -15,6 +15,7 @@ public class AudioManager : Singleton<AudioManager>
     [SerializeField] AudioSource playerHit, jumpSfx, itemPickup;
     [SerializeField] AudioSource enemyHit, bossHit, screamSfx;
     [SerializeField] AudioSource floorSpikeSfx, fallingSpikeSfx, slashImpactSfx, energyBlastSfx;
+    [SerializeField] AudioSource blazeSfx, levelUpSfx;
 
     public void PlayPlayerHit() { if (playerHit != null) playerHit.Play(); }
     public void PlayJumpSfx() { if (jumpSfx != null) jumpSfx.Play(); }
@@ -28,6 +29,9 @@ public class AudioManager : Singleton<AudioManager>
     public void PlaySpikeImpactSfx() { if (fallingSpikeSfx != null) fallingSpikeSfx.Play(); }
     public void PlaySlashSfx() { if (slashImpactSfx != null) slashImpactSfx.Play(); }
     public void PlayBlastSfx() { if (energyBlastSfx != null) energyBlastSfx.Play(); }
+    
+    public void PlayBlazeSfx() { if (blazeSfx != null) blazeSfx.Play(); }
+    public void PlayLevelUpSfx() { if (levelUpSfx != null) levelUpSfx.Play(); }
     
     void Start()
     {

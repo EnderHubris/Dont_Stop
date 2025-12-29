@@ -109,6 +109,7 @@ public class PlayerManager : Singleton<PlayerManager>
 
         if (points >= pointRequirement)
         {
+            AudioManager.Instance.PlayLevelUpSfx();
             ++level;
             points = 0;
             pointRequirement = (int)Mathf.Ceil((float)pointRequirement * 1.5f);

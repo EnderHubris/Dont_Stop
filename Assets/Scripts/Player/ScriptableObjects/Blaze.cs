@@ -28,9 +28,16 @@ public class Blaze : Ability
     }
     void BlazeBlast()
     {
+        bool playSound = true;
         Collider2D[] targets = FindTargets();
         foreach (Collider2D target in targets)
         {
+            if (playSound)
+            {
+                AudioManager.Instance.PlayBlazeSfx();
+                playSound = false;
+            }
+
             IEnemy enemy = target.GetComponent<IEnemy>();
             if (enemy != null)
             {
