@@ -110,7 +110,9 @@ public class AudioManager : Singleton<AudioManager>
             BossIntro.volume = Mathf.Lerp(BossIntro.volume, 0.8f, shiftSpeed * Time.deltaTime);
             yield return null;
         }
+
         BossIntro.volume = 0.8f;
+        BossMain.volume = 0.8f;
     }
 
 //=======================================================================

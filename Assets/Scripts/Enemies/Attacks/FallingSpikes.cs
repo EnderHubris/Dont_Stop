@@ -31,7 +31,6 @@ public class FallingSpikes : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("Spike Landed");
         PlayerManager.Instance.CameraShake();
         AudioManager.Instance.PlaySpikeImpactSfx();
 

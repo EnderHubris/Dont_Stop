@@ -19,6 +19,12 @@ public class PlayerCamera : MonoBehaviour
     int strength = 1;
     Vector3 target, bossViewPoint;
 
+    void Awake()
+    {
+        // force reset position
+        transform.position = new Vector3(0,0,-10);
+    }
+
     void Start()
     {
         _ = AlignCamera(); // run and forget about it
