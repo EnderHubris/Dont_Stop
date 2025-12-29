@@ -187,6 +187,8 @@ public class PlayerCamera : MonoBehaviour
     {
         DeathScreen.SetActive(false);
         screenCover.Play("toBlack");
+        AudioManager.Instance.Transitioning();
+
         Invoke("LoadMainMenu", 4);
     }
     void LoadMainMenu() { SceneManager.LoadScene(0); }
@@ -196,6 +198,8 @@ public class PlayerCamera : MonoBehaviour
     {
         DeathScreen.SetActive(false);
         screenCover.Play("toBlack");
+        AudioManager.Instance.Transitioning();
+        
         Invoke("LoadGame", 4);
     }
     void LoadGame() { SceneManager.LoadScene(1); }

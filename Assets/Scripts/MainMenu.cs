@@ -89,6 +89,7 @@ public class MainMenu : MonoBehaviour
     {
         btnGroup.SetActive(false);
         screenCover.Play("toBlack");
+        AudioManager.Instance.Transitioning();
 
         // give illusion of loading
         Invoke("LoadLevel", 3);

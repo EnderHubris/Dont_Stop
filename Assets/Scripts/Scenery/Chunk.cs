@@ -180,6 +180,8 @@ public class Chunk : MonoBehaviour
 
     void PrepareBossFight()
     {
+        AudioManager.Instance.PlayBossIntro();
+
         fightTriggered = true;
         
         if (border != null) border.SetActive(true);
@@ -208,6 +210,7 @@ public class Chunk : MonoBehaviour
     
     void BossFightEnded()
     {
+        AudioManager.Instance.BossEnded();
         bossKilled = true;
         border.SetActive(false);
         PlayerManager.Instance.inBossFight = false;
