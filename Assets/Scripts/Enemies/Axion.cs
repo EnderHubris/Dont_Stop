@@ -169,6 +169,7 @@ public class Axion : MonoBehaviour, IEnemy, IBoss
             if (randValue < jumpChance)
             {
                 // anim.Play("jump");
+                AudioManager.Instance.PlayJumpSfx();
                 jumped = true;
                 useRunVel = false;
 
@@ -235,6 +236,7 @@ public class Axion : MonoBehaviour, IEnemy, IBoss
         specialDelay = new Sleep(3f);
 
         scream.Play();
+        AudioManager.Instance.PlayScream();
         PlayerManager.Instance.CameraShake();
 
         new RunAfter(1, EnergyBlasts);
@@ -352,6 +354,7 @@ public class Axion : MonoBehaviour, IEnemy, IBoss
         } else
             {
                 if (!attacking) anim.Play("hurt");
+                AudioManager.Instance.PlayBossHit();
             }
     }
     public bool IsDead() => isDead;

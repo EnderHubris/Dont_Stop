@@ -32,6 +32,10 @@ public class EnergyBlast : MonoBehaviour
 
     // animation target
     public void CameraShake() { PlayerManager.Instance.CameraShake(); }
-    public void AllowDamage() { canDamage = true; }
+    public void AllowDamage()
+    {
+        AudioManager.Instance.PlayBlastSfx();
+        canDamage = true;
+    }
     public void DisableDamage() { canDamage = false; }
 }//EndScript

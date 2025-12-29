@@ -128,6 +128,7 @@ public class PlayerManager : Singleton<PlayerManager>
         } else
             {
                 playerAnimator.Play("hurt");
+                AudioManager.Instance.PlayPlayerHit();
             }
     }
     public void InstantKill()

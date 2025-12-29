@@ -176,6 +176,7 @@ public class Mushroom : MonoBehaviour, IEnemy
             if (randValue < jumpChance)
             {
                 anim.Play("jump");
+                AudioManager.Instance.PlayJumpSfx();
                 jumped = true;
                 useRunVel = false;
 
@@ -313,6 +314,7 @@ public class Mushroom : MonoBehaviour, IEnemy
         } else
             {
                 anim.Play("hurt");
+                AudioManager.Instance.PlayEnemyHit();
             }
     }
     public bool IsDead() => isDead;

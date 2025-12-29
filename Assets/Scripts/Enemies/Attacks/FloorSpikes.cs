@@ -38,6 +38,10 @@ public class FloorSpikes : MonoBehaviour
     }
 
     // animation target
-    public void AllowDamage() { canDamage = true; }
+    public void AllowDamage()
+    {
+        AudioManager.Instance.PlayFloorSpikeSfx();
+        canDamage = true;
+    }
     public void DisableDamage() { canDamage = false; }
 }//EndScript

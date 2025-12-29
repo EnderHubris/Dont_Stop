@@ -44,6 +44,7 @@ public class FurySlash : MonoBehaviour
     {
         Debug.Log("Slice Landed");
         PlayerManager.Instance.CameraShake();
+        AudioManager.Instance.PlaySlashSfx();
         
         if (collision.gameObject.GetComponent<PlayerManager>() != null)
         {

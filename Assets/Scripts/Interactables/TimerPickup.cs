@@ -14,6 +14,7 @@ public class TimerPickup : Interactables
     protected override void Collect()
     {
         PlayerHUD.Instance.GainTime(TimeAmount);
+        AudioManager.Instance.PlayPickupSfx();
         Destroy();
     }
 

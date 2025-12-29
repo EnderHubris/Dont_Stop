@@ -33,6 +33,7 @@ public class FallingSpikes : MonoBehaviour
     {
         Debug.Log("Spike Landed");
         PlayerManager.Instance.CameraShake();
+        AudioManager.Instance.PlaySpikeImpactSfx();
 
         if (!spriteRenderer.enabled) return;
         

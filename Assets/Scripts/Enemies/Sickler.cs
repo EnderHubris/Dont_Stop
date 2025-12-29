@@ -169,6 +169,7 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
             if (randValue < jumpChance)
             {
                 // anim.Play("jump");
+                AudioManager.Instance.PlayJumpSfx();
                 jumped = true;
                 useRunVel = false;
 
@@ -235,6 +236,7 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
         inFury = true;
 
         scream.Play();
+        AudioManager.Instance.PlayScream();
         PlayerManager.Instance.CameraShake();
 
         new RunAfter(1, FurySlashes);
@@ -359,6 +361,7 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
         } else
             {
                 if (!attacking) anim.Play("hurt");
+                AudioManager.Instance.PlayBossHit();
             }
     }
     public bool IsDead() => isDead;

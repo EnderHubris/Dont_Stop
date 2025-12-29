@@ -219,6 +219,7 @@ public class Batty : MonoBehaviour, IEnemy
         } else
             {
                 anim.Play("hurt");
+                AudioManager.Instance.PlayEnemyHit();
             }
     }
     public bool IsDead() => isDead;

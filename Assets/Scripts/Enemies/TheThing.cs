@@ -168,6 +168,7 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
             if (randValue < jumpChance)
             {
                 // anim.Play("jump");
+                AudioManager.Instance.PlayJumpSfx();
                 jumped = true;
                 useRunVel = false;
 
@@ -250,6 +251,7 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
         specialDelay = new Sleep(3f);
 
         scream.Play();
+        AudioManager.Instance.PlayScream();
         PlayerManager.Instance.CameraShake();
 
         if (Random.Range(0,100) < 50)
@@ -374,6 +376,7 @@ public class TheThing : MonoBehaviour, IEnemy, IBoss
         } else
             {
                 if (!attacking) anim.Play("hurt");
+                AudioManager.Instance.PlayBossHit();
             }
     }
     public bool IsDead() => isDead;
