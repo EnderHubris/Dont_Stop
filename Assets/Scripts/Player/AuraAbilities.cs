@@ -1,5 +1,8 @@
 using Utilities;
 
+using System.Collections;
+using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -32,7 +35,7 @@ public abstract class Ability : ScriptableObject
 [RequireComponent(typeof(SpriteRenderer))]
 public class AuraAbilities : MonoBehaviour
 {
-    [SerializeField] Ability[] abilities;
+    [SerializeField] List<Ability> abilities = new List<Ability>();
     Animator abilityVfx;
     SpriteRenderer vfxRenderer;
 
@@ -47,17 +50,17 @@ public class AuraAbilities : MonoBehaviour
 
     void Update()
     {
-        if (abilities.Length == 0) return;
+        if (abilities.Count == 0) return;
         if (abilityVfx == null) return;
 
         if (PlayerInput.PressedPrevSkill())
         {
             Debug.Log("Pressed L-DPAD");
-            selected = (selected - 1 + abilities.Length) % abilities.Length;
+            selected = (selected - 1 + abilities.Count) % abilities.Count;
         } else if (PlayerInput.PressedNextSkill())
             {
                 Debug.Log("Pressed R-DPAD");
-                selected = ++selected % abilities.Length;
+                selected = ++selected % abilities.Count;
             }
 
         UpdateIcon();
@@ -94,4 +97,6 @@ public class AuraAbilities : MonoBehaviour
             vfxRenderer.color = ability.GetBaseColor();
         }
     }
+
+    public void PushAbility(Ability ability) { if (!abilities.Contains(ability)) abilities.Add(ability); }
 }//EndScript

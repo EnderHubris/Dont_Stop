@@ -55,6 +55,7 @@ public class PlayerManager : Singleton<PlayerManager>
     [Header("Player Components")]
     [SerializeField] Animator playerAnimator;
     [SerializeField] PlayerCamera playerCamera;
+    [SerializeField] AuraAbilities abilities;
 
     [Header("Player Stats")]
     public float moveSpeed = 4, jumpForce = 3, gravityMultiplier = 2, launchPadMultiplier = 2.5f;
@@ -170,6 +171,16 @@ public class PlayerManager : Singleton<PlayerManager>
     public void CameraShake()
     {
         if (playerCamera) playerCamera.CameraShake();
+    }
+
+    // based on level player gets a new ability to use
+    // to utilize the level system
+    public void GiveAbility(Ability ability)
+    {
+        if (abilities != null)
+        {
+            abilities.PushAbility(ability);
+        }
     }
 
     [Header("Player States")]
