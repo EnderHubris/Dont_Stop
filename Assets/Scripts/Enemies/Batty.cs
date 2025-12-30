@@ -165,21 +165,30 @@ public class Batty : MonoBehaviour, IEnemy
         }
     }
 
-    bool effectActive = false;
-    RunAfter effectAfter;
+    public void Shock(int damage)
+    {
+        if (isDead) return;
+
+        if (effectAnim != null)
+            effectAnim.Play("shock"); // animation naturally flows to no_effect
+
+        TakeDamage(damage); // instant damage
+    }
+
+    bool isBurning = false;
     public void Ignite(float duration)
     {
         if (isDead) return;
-        if (effectActive) return;
+        if (isBurning) return;
         if (effectAnim != null) effectAnim.Play("ignite");
 
-        effectActive = true;
+        isBurning = true;
         _ = DamageOverTime(1000);
-        effectAfter = new RunAfter(duration, EndEffect);
+        new RunAfter(duration, EndEffect);
     }
     async Task DamageOverTime(int delay)
     {
-        while (effectActive)
+        while (isBurning)
         {
             if (isDead) return;
             TakeDamage(3, false);
@@ -188,11 +197,13 @@ public class Batty : MonoBehaviour, IEnemy
     }
     void EndEffect()
     {
-        effectActive = false;
+        if (isDead) return;
+
+        isBurning = false;
         if (effectAnim != null) effectAnim.Play("no_effect");
     }
 
-    public void TakeDamage(int amount, bool getAura)
+    public void TakeDamage(int amount, bool getAura = true)
     {
         if (isDead) return;
         PlayerManager.Instance.GainAura(auraGain);
@@ -208,7 +219,6 @@ public class Batty : MonoBehaviour, IEnemy
         {
             PlayerManager.Instance.GainPoints(pointCost);
 
-            if (effectAfter != null) effectAfter.Stop();
             EndEffect();
 
             PlayerHUD.Instance.GainTime(timeGain);

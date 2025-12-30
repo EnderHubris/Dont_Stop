@@ -298,21 +298,30 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
     }
     void ReviveFinished() { isDead = false; }
 
-    bool effectActive = false;
-    RunAfter effectAfter;
+    public void Shock(int damage)
+    {
+        if (isDead) return;
+
+        if (effectAnim != null)
+            effectAnim.Play("shock"); // animation naturally flows to no_effect
+
+        TakeDamage(damage); // instant damage
+    }
+
+    bool isBurning = false;
     public void Ignite(float duration)
     {
         if (isDead) return;
-        if (effectActive) return;
+        if (isBurning) return;
         if (effectAnim != null) effectAnim.Play("ignite");
 
-        effectActive = true;
+        isBurning = true;
         _ = DamageOverTime(1000);
-        effectAfter = new RunAfter(duration, EndEffect);
+        new RunAfter(duration, EndEffect);
     }
     async Task DamageOverTime(int delay)
     {
-        while (effectActive)
+        while (isBurning)
         {
             if (isDead) return;
             TakeDamage(3, false);
@@ -321,13 +330,15 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
     }
     void EndEffect()
     {
-        effectActive = false;
+        if (isDead) return;
+
+        isBurning = false;
         if (effectAnim != null) effectAnim.Play("no_effect");
     }
 
     int afterDeathHits = 0;
     bool enraged = false;
-    public void TakeDamage(int amount, bool getAura)
+    public void TakeDamage(int amount, bool getAura = true)
     {
         PlayerManager.Instance.GainAura(auraGain);
 
@@ -349,7 +360,6 @@ public class Sickler : MonoBehaviour, IEnemy, IBoss
         {
             PlayerManager.Instance.GainPoints(pointCost);
             
-            if (effectAfter != null) effectAfter.Stop();
             EndEffect();
 
             PlayerHUD.Instance.GainTime((!enraged) ? timeGain : timeGain * 3);

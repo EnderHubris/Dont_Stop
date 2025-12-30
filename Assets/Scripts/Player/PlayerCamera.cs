@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 public class PlayerCamera : MonoBehaviour
 {
     [SerializeField] float verticalOffset = 4f, shiftSpeed = 10f;
-    [SerializeField] Transform playerCenter;
+    [SerializeField] Transform playerCenter, cameraPivot;
     [SerializeField] GameObject DeathScreen;
     [SerializeField] Animator screenCover;
 
@@ -21,8 +21,9 @@ public class PlayerCamera : MonoBehaviour
 
     void Awake()
     {
-        // force reset position
-        transform.position = new Vector3(0,0,-10);
+        // force reset positions
+        cameraPivot.position = Vector3.zero;
+        Camera.main.transform.localPosition = new Vector3(0,0,-10);
     }
 
     void Start()
@@ -33,7 +34,7 @@ public class PlayerCamera : MonoBehaviour
     void Update()
     {
         target = playerCenter.position;
-        target.z = Camera.main.transform.position.z;
+        target.z = cameraPivot.position.z;
         target.y += verticalOffset * strength;
 
         if (PlayerManager.Instance.IsDead())
@@ -42,8 +43,8 @@ public class PlayerCamera : MonoBehaviour
         }
     }
 
-    public void Attach() { transform.SetParent(PlayerManager.Instance.transform); }
-    public void Detach() { transform.SetParent(null); }
+    public void Attach() { cameraPivot.SetParent(PlayerManager.Instance.transform); }
+    public void Detach() { cameraPivot.SetParent(null); }
 
     Vector2 lastCameraPos = Vector2.zero;
     async Task AlignCamera()
@@ -58,7 +59,7 @@ public class PlayerCamera : MonoBehaviour
                     // strength = (PlayerManager.Instance.grounded) ? 1 : 0;
                     if (PlayerManager.Instance.grounded)
                     {
-                        lastCameraPos = new Vector2(0, Camera.main.transform.position.y + 1f);
+                        lastCameraPos = new Vector2(0, cameraPivot.position.y + 1f);
                         strength = 1;
                     } else
                         {
@@ -77,44 +78,44 @@ public class PlayerCamera : MonoBehaviour
     }
     void FollowPlayer()
     {
-        float remainingDistance = Vector3.Distance(Camera.main.transform.position, target);
+        float remainingDistance = Vector3.Distance(cameraPivot.position, target);
 
         if (remainingDistance > 0.1f)
         {
             // allow for smooth transition
-            Camera.main.transform.position = Vector3.Lerp(
-                Camera.main.transform.position,
+            cameraPivot.position = Vector3.Lerp(
+                cameraPivot.position,
                 target,
                 shiftSpeed * Time.deltaTime
             );
         } else
             {
                 // snap when distance is small
-                Camera.main.transform.position = target;
+                cameraPivot.position = target;
             }
     }
 
     public void SetBossViewPoint(Vector3 pos)
     {
-        bossViewPoint = new Vector3(pos.x, pos.y, Camera.main.transform.position.z);
+        bossViewPoint = new Vector3(pos.x, pos.y, cameraPivot.position.z);
     }
 
     void ShowBossView()
     {
-        float remainingDistance = Vector3.Distance(Camera.main.transform.position, bossViewPoint);
+        float remainingDistance = Vector3.Distance(cameraPivot.position, bossViewPoint);
 
         if (remainingDistance > 0.1f)
         {
             // allow for smooth transition
-            Camera.main.transform.position = Vector3.Lerp(
-                Camera.main.transform.position,
+            cameraPivot.position = Vector3.Lerp(
+                cameraPivot.position,
                 bossViewPoint,
                 shiftSpeed * 1.5f * Time.deltaTime
             );
         } else
             {
                 // snap when distance is small
-                Camera.main.transform.position = bossViewPoint;
+                cameraPivot.position = bossViewPoint;
             }
     }
 
@@ -170,7 +171,7 @@ public class PlayerCamera : MonoBehaviour
     {
         if (shaking) return;
 
-        Vector3 oPos = Camera.main.transform.position;
+        Vector3 oPos = Camera.main.transform.localPosition;
         float timeElapsed = 0;
         shaking = true;
 
@@ -179,12 +180,12 @@ public class PlayerCamera : MonoBehaviour
             float x = UnityEngine.Random.Range(0.3f, 0.55f);
             float y = UnityEngine.Random.Range(0.3f, 0.55f);
 
-            Camera.main.transform.position = oPos + new Vector3(x, y, oPos.z);
+            Camera.main.transform.localPosition = oPos + new Vector3(x, y, oPos.z);
             timeElapsed += Time.deltaTime;
             await Task.Yield();
         }
 
-        Camera.main.transform.position = oPos;
+        Camera.main.transform.localPosition = oPos;
         shaking = false;
     }
 

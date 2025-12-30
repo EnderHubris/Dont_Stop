@@ -98,5 +98,15 @@ public class AuraAbilities : MonoBehaviour
         }
     }
 
-    public void PushAbility(Ability ability) { if (!abilities.Contains(ability)) abilities.Add(ability); }
+    public void PushAbility(Ability ability)
+    {
+        if (!abilities.Contains(ability))
+        {
+            // when a new ability is added
+            // force select so the player sees
+            // the new ability
+            abilities.Add(ability);
+            selected = abilities.Count - 1;
+        }
+    }
 }//EndScript

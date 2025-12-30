@@ -57,6 +57,8 @@ public class PlayerManager : Singleton<PlayerManager>
     [SerializeField] PlayerCamera playerCamera;
     [SerializeField] AuraAbilities abilities;
 
+    [SerializeField] Ability[] unlockableAbilities;
+
     [Header("Player Stats")]
     public float moveSpeed = 4, jumpForce = 3, gravityMultiplier = 2, launchPadMultiplier = 2.5f;
     public int attackDamage = 10;
@@ -69,6 +71,7 @@ public class PlayerManager : Singleton<PlayerManager>
     int points = 0;
     int pointRequirement = 100;
     int level = 1;
+    int unlockIndex = 0;
 
     [SerializeField] int health = 100, aura = 0;
 
@@ -112,6 +115,16 @@ public class PlayerManager : Singleton<PlayerManager>
         {
             AudioManager.Instance.PlayLevelUpSfx();
             ++level;
+
+            // unlock an ability every 10 lvls
+            if (level % 10 == 0)
+            {
+                GiveAbility(unlockableAbilities[unlockIndex]);
+                
+                // keep the index within bounds
+                unlockIndex = ++unlockIndex % unlockableAbilities.Length;
+            }
+
             points = 0;
             pointRequirement = (int)Mathf.Ceil((float)pointRequirement * 1.5f);
             PlayerHUD.Instance.UpdateLevelDisplay();
@@ -192,6 +205,7 @@ public class PlayerManager : Singleton<PlayerManager>
     public bool inBossFight = false;
     bool isDead = false;
     [SerializeField] bool iframeActive = false;
+    public bool lookingLeft = false;
 
     public bool IsDead() => isDead;
 

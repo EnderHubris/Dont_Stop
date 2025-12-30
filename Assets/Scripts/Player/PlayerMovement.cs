@@ -90,6 +90,8 @@ public class PlayerMovement : MonoBehaviour
         else if (PlayerInput.MovingLeft()) velx = -PlayerManager.Instance.moveSpeed;
 
         if (velx != 0) spriteRenderer.flipX = velx < 0;
+        
+        PlayerManager.Instance.lookingLeft  = spriteRenderer.flipX;
 
         rb2d.linearVelocity = new Vector2(velx, rb2d.linearVelocityY);
 
